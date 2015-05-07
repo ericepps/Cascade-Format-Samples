@@ -24,8 +24,29 @@ $contentString.substring( $startPosExc, $contentString.indexOf($endString,$start
         #set ( $siteStart = 'site="' )
         #set ( $siteName = "#strByStartEnd($shortCode $siteStart $endAtt)" )
         #set ( $xhtmlBlock = $_.locateBlock($blockPath,$siteName) )
-        #set ( $contentConcat = $contentString.replace($fullShortCode,$xhtmlBlock.xHTML) )
-        #xhtmlBlock($contentConcat)
+        #set ( $contentReplace = $contentString.replace($fullShortCode,$xhtmlBlock.xHTML) )
+        #xhtmlBlock($contentReplace)
+    #else
+        $contentString
+    #end
+#end
+
+## Macro to parse a ShortCode and return the contents of an text block in its place
+#macro ( textBlock $contentString )
+    #set ( $startPosPar = $contentString.indexOf('[textBlock') )
+    #if ($startPosPar > 0)
+        #set ( $shortCode = "#strByStartEnd($contentString '[textBlock' ']')" )
+        #set ( $endPos = $contentString.indexOf(']',$startPosPar) )
+        #set ( $endPos = $endPos + 1 )
+        #set ( $fullShortCode = $contentString.substring($startPosPar,$endPos) )
+        #set ( $endAtt = '"' )
+        #set ( $pathStart = 'path="' )
+        #set ( $blockPath = "#strByStartEnd($shortCode $pathStart $endAtt)" )
+        #set ( $siteStart = 'site="' )
+        #set ( $siteName = "#strByStartEnd($shortCode $siteStart $endAtt)" )
+        #set ( $textBlock = $_.locateBlock($blockPath,$siteName) )
+        #set ( $contentReplace = $contentString.replace($fullShortCode,$textBlock.text) )
+        #textBlock($contentReplace)
     #else
         $contentString
     #end
