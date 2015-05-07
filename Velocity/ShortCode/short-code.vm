@@ -45,7 +45,7 @@ $contentString.substring( $startPosExc, $contentString.indexOf($endString,$start
         #set ( $siteStart = 'site="' )
         #set ( $siteName = "#strByStartEnd($shortCode $siteStart $endAtt)" )
         #set ( $textBlock = $_.locateBlock($blockPath,$siteName) )
-        #set ( $contentReplace = $contentString.replace($fullShortCode,$textBlock.text) )
+        #set ( $contentReplace = $contentString.replace($fullShortCode,$_EscapeTool.xml($textBlock.text)) )
         #textBlock($contentReplace)
     #else
         #set ( $content = $contentString )
