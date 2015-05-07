@@ -27,7 +27,7 @@ $contentString.substring( $startPosExc, $contentString.indexOf($endString,$start
         #set ( $contentReplace = $contentString.replace($fullShortCode,$xhtmlBlock.xHTML) )
         #xhtmlBlock($contentReplace)
     #else
-        $contentString
+        #set ( $content = $contentString )
     #end
 #end
 
@@ -48,9 +48,14 @@ $contentString.substring( $startPosExc, $contentString.indexOf($endString,$start
         #set ( $contentReplace = $contentString.replace($fullShortCode,$textBlock.text) )
         #textBlock($contentReplace)
     #else
-        $contentString
+        #set ( $content = $contentString )
     #end
 #end
 
-##Call the Macro
-#xhtmlBlock($serializedPageContent)
+##Call the Macros
+#set ( $content = $_SerializerTool.serialize($wysiwyg,true) )
+#xhtmlBlock($content)
+#textBlock($content)
+
+## Output processed content
+$content
