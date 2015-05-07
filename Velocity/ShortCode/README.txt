@@ -9,7 +9,5 @@ Macros can be added to existing Velocity formats to implement the ShortCode. To 
 a serialized copy of HTML (e.g. WYSIWYG content) to the macro like:
     #set ( $content = $_SerializerTool.serialize($wysiwyg,true) )
     #xhtmlBlock ($content)
-
-
-PLANNED ADDITIONS: 
-* maybe add ddBlock ShortCode for Data Definition blocks
+    #textBlock ($content)
+	$content
