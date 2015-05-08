@@ -1,7 +1,7 @@
 ## Macro to get a substring by a start and ending string, e.g.
-##		Full String					Start String	End String	Return
-##		[xhtmlBlock blahblah]		[xhtmlBlock		]			 blahblah
-##		path="some/path"			path="			"			some/path
+##    Full String                 Start String       End String        Return
+##    [xhtmlBlock blahblah]       [xhtmlBlock        ]                 blahblah
+##    path="some/path"            path="             "                 some/path
 #macro ( strByStartEnd $contentString $startString $endString )##
 #set ( $startPos = $contentString.indexOf($startString) )##
 #if ($startPos > 0)##
