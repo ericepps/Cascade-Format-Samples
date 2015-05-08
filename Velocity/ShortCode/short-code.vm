@@ -1,61 +1,50 @@
-## Macro to get a substring by a start and ending string, e.g.
-##    Full String                 Start String       End String        Return
-##    [xhtmlBlock blahblah]       [xhtmlBlock        ]                 blahblah
-##    path="some/path"            path="             "                 some/path
+#*
+Macro to get a substring by a start and end string, e.g.
+  Full String           Start String    End String  Return
+  [getBlock settings]   [xhtmlBlock     ]           settings
+  attribute="your/path" attribute="     "           your/path
+*#
+
 #macro ( strByStartEnd $contentString $startString $endString )##
 #set ( $startPos = $contentString.indexOf($startString) )##
-#if ($startPos > 0)##
+#if ( $startPos > 0 )##
 #set ( $startPosExc = $startPos + $startString.length() )##
-$contentString.substring( $startPosExc, $contentString.indexOf($endString,$startPosExc) )##
+$contentString.substring($startPosExc, $contentString.indexOf($endString, $startPosExc))##
 #end##
 #end
 
-## Macro to parse a ShortCode and return the contents of an XHTML block in its place
-#macro ( xhtmlBlock $contentString )
-    #set ( $startPosPar = $contentString.indexOf('[xhtmlBlock') )
-    #if ($startPosPar > 0)
-        #set ( $shortCode = "#strByStartEnd($contentString '[xhtmlBlock' ']')" )
-        #set ( $endPos = $contentString.indexOf(']',$startPosPar) )
+## Macro to parse a ShortCode and return the contents of a Block in its place
+#macro ( getBlock $contentString )
+    #set ( $startPosPar = $contentString.indexOf('[getBlock') )
+    #if ( $startPosPar > 0 )
+        #set ( $shortCode = "#strByStartEnd($contentString, '[getBlock', ']')" )
+        #set ( $endPos = $contentString.indexOf(']', $startPosPar) )
         #set ( $endPos = $endPos + 1 )
-        #set ( $fullShortCode = $contentString.substring($startPosPar,$endPos) )
+        #set ( $fullShortCode = $contentString.substring($startPosPar, $endPos) )
         #set ( $endAtt = '"' )
+        #set ( $typeStart = 'type="' )
+        #set ( $typeValue = "#strByStartEnd($shortCode, $typeStart, $endAtt)" )
         #set ( $pathStart = 'path="' )
-        #set ( $blockPath = "#strByStartEnd($shortCode $pathStart $endAtt)" )
+        #set ( $pathValue = "#strByStartEnd($shortCode, $pathStart, $endAtt)" )
         #set ( $siteStart = 'site="' )
-        #set ( $siteName = "#strByStartEnd($shortCode $siteStart $endAtt)" )
-        #set ( $xhtmlBlock = $_.locateBlock($blockPath,$siteName) )
-        #set ( $contentReplace = $contentString.replace($fullShortCode,$xhtmlBlock.xHTML) )
-        #xhtmlBlock($contentReplace)
+        #set ( $siteValue = "#strByStartEnd($shortCode, $siteStart, $endAtt)" )
+        #set ( $theBlock = $_.locateBlock($pathValue, $siteValue) )
+        #if ( $typeValue == "xhtml" )
+            #set ( $contentReplace = $contentString.replace($fullShortCode, $theBlock.xHTML) )
+        #else
+            ## Known issue with Cascade API. Currently waiting on code revision to be pushed through.
+            ## It is necesary to remove the <system-xml> tags in the meantime.
+            #set ( $contentReplace = $contentString.replace($fullShortCode, $_EscapeTool.xml($theBlock.text.replace("<system-xml>","").replace("</system-xml>","")))) )
+        #end
+        #getBlock($contentReplace)
     #else
         #set ( $content = $contentString )
     #end
 #end
 
-## Macro to parse a ShortCode and return the contents of an text block in its place
-#macro ( textBlock $contentString )
-    #set ( $startPosPar = $contentString.indexOf('[textBlock') )
-    #if ($startPosPar > 0)
-        #set ( $shortCode = "#strByStartEnd($contentString '[textBlock' ']')" )
-        #set ( $endPos = $contentString.indexOf(']',$startPosPar) )
-        #set ( $endPos = $endPos + 1 )
-        #set ( $fullShortCode = $contentString.substring($startPosPar,$endPos) )
-        #set ( $endAtt = '"' )
-        #set ( $pathStart = 'path="' )
-        #set ( $blockPath = "#strByStartEnd($shortCode $pathStart $endAtt)" )
-        #set ( $siteStart = 'site="' )
-        #set ( $siteName = "#strByStartEnd($shortCode $siteStart $endAtt)" )
-        #set ( $textBlock = $_.locateBlock($blockPath,$siteName) )
-        #set ( $contentReplace = $contentString.replace($fullShortCode,$_EscapeTool.xml($textBlock.text)) )
-        #textBlock($contentReplace)
-    #else
-        #set ( $content = $contentString )
-    #end
-#end
-
-##Call the Macros
-#set ( $content = $_SerializerTool.serialize($wysiwyg,true) )
-#xhtmlBlock($content)
-#textBlock($content)
-
-## Output processed content
-$content
+##Call the Macro and output processed content
+#set ( $page = $_XPathTool.selectSingleNode($contentRoot, "/system-index-block/calling-page/system-page") )
+#set ( $data = $page.getChild("system-data-structure") )
+#set ( $content = $_SerializerTool.serialize($data.getChild("content"), true) )
+#getBlock($content)
+${content}
