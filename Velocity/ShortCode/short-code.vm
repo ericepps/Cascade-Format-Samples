@@ -1,7 +1,7 @@
 #*
 Macro to get a substring by a start and end string, e.g.
   Full String           Start String    End String  Return
-  [getBlock settings]   [xhtmlBlock     ]           settings
+  [getBlock settings]   [getBlock       ]           settings
   attribute="your/path" attribute="     "           your/path
 *#
 
