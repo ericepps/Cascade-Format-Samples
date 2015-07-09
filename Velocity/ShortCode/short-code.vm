@@ -36,6 +36,14 @@ $contentString.substring($startPosExc, $contentString.indexOf($endString, $start
             ## It is necesary to remove the <system-xml> tags in the meantime.
             #set ( $contentReplace = $contentString.replace($fullShortCode, $_EscapeTool.xml($theBlock.text.replace("<system-xml>","").replace("</system-xml>","")))) )
         #end
+        #set ( $replaceStart = 'replace="' )
+        #set ( $replaceAttributes = "#strByStartEnd($shortCode $replaceStart $endAtt)" )
+        #foreach($replaceAttribute in $replaceAttributes.split("[ ]"))
+            #set ( $attNameStart = "${replaceAttribute}=${endAtt}" )
+            #set ( $replaceAttributeContent = "#strByStartEnd($shortCode $attNameStart $endAtt)" )
+            #set ( $replaceAttributeContent = $_SerializerTool.serialize($replaceAttributeContent,false) )
+            #set ( $contentReplace = $contentReplace.replace("[|[${replaceAttribute}]|]",$replaceAttributeContent) )
+        #end
         #getBlock($contentReplace)
     #else
         #set ( $content = $contentString )
